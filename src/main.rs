@@ -2,13 +2,13 @@ use std::path::PathBuf;
 use clap::Parser;
 use anyhow::Result;
 
-use chx::cli::commands::Command;
-use chx::cli::io;
-use chx::pgn::PgnParser;
-use chx::pgn::write_game;
+use chxss::cli::commands::Command;
+use chxss::cli::io;
+use chxss::pgn::PgnParser;
+use chxss::pgn::write_game;
 
 #[derive(Parser)]
-#[command(name = "chx", version, about = "Chess data processing toolkit")]
+#[command(name = "chxss", version, about = "Chess data processing toolkit")]
 struct Cli {
     /// Input file (reads from stdin if omitted)
     #[arg(short = 'i', long = "input", global = true)]
@@ -33,7 +33,7 @@ fn main() -> Result<()> {
     match cli.command {
         Command::MinElo { min, max } => {
             let games = PgnParser::new(buf_reader).collect::<Vec<_>>();
-            let filtered = chx::tools::pgn::filter::min_elo(games, min, max);
+            let filtered = chxss::tools::pgn::filter::min_elo(games, min, max);
             for game in filtered {
                 let game = game?;
                 write_game(&mut writer, &game)?;
@@ -41,7 +41,7 @@ fn main() -> Result<()> {
         }
         Command::MinPly { min } => {
             let games = PgnParser::new(buf_reader).collect::<Vec<_>>();
-            let filtered = chx::tools::pgn::filter::min_ply(games, min);
+            let filtered = chxss::tools::pgn::filter::min_ply(games, min);
             for game in filtered {
                 let game = game?;
                 write_game(&mut writer, &game)?;
