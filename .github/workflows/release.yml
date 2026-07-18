@@ -29,10 +29,12 @@ jobs:
         with:
           targets: ${{ matrix.target }}
       - run: cargo build --release --target ${{ matrix.target }}
+      - name: Rename binary
+        run: mv target/${{ matrix.target }}/release/chxss${{ matrix.suffix }} target/${{ matrix.target }}/release/chxss-${{ matrix.target }}${{ matrix.suffix }}
       - uses: actions/upload-artifact@v4
         with:
           name: chxss-${{ matrix.target }}
-          path: target/${{ matrix.target }}/release/chxss${{ matrix.suffix }}
+          path: target/${{ matrix.target }}/release/chxss-${{ matrix.target }}${{ matrix.suffix }}
 
   release:
     needs: build
@@ -42,18 +44,8 @@ jobs:
         with:
           path: artifacts
           merge-multiple: true
-      - name: Rename binaries
-        run: |
-          mv artifacts/chxss artifacts/chxss-linux-x86_64
-          mv artifacts/chxss.exe artifacts/chxss-windows-x86_64.exe
-          # macOS binary has no suffix, already named chxss
-          mv artifacts/chxss artifacts/chxss-macos-aarch64
-        continue-on-error: true
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
-          files: |
-            artifacts/chxss-linux-x86_64
-            artifacts/chxss-macos-aarch64
-            artifacts/chxss-windows-x86_64.exe
+          files: artifacts/*
